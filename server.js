@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 30000;
 
 // Middleware
 app.use(express.json());
@@ -21,11 +21,13 @@ if (!fs.existsSync(baseUploadsDir)) {
 }
 
 function sanitizeSegment(segment) {
+  // Preserve letters/numbers from all languages; drop path separators and unsafe chars
   return segment
+    .normalize('NFKC')
     .trim()
     .replace(/[\\/]/g, '-')
     .replace(/\s+/g, '_')
-    .replace(/[^\w\-\.]/g, '')
+    .replace(/[^\p{L}\p{N}\p{M}\-_.]/gu, '')
     .slice(0, 80);
 }
 
@@ -64,10 +66,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB per file
-    files: 10,
-  },
 });
 
 // Data persistence: simple JSON index per person folder
@@ -88,7 +86,7 @@ function writeFolderIndex(folderPath, data) {
 }
 
 // Upload endpoint
-app.post('/api/upload', upload.array('files', 10), (req, res) => {
+app.post('/api/upload', upload.array('files'), (req, res) => {
   try {
     const { className, personName, description } = req.body;
     if (!className || !personName) {
