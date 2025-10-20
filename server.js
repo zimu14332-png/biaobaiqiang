@@ -95,6 +95,7 @@ app.post('/api/upload', upload.array('files', 10), (req, res) => {
     const createdAt = Date.now();
     const items = files.map((f) => ({
       type: f.mimetype.startsWith('video') ? 'video' : 'image',
+      mimeType: f.mimetype,
       filename: path.basename(f.path),
       url: `/uploads/${folderName}/${path.basename(f.path)}`,
       uploadedAt: createdAt,

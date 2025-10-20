@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>表白墙 - 首页</title>
+  <link href="https://vjs.zencdn.net/8.14.1/video-js.css" rel="stylesheet" />
   <style>
     :root {
       --pink: #ff6b81;
@@ -14,12 +15,12 @@
       --border: #e0e0e6;
     }
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: var(--bg); color: var(--text); }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: linear-gradient(180deg, #fff0f5, #ffe6ef); color: var(--text); }
     header { position: sticky; top: 0; z-index: 10; background: var(--pink); color: white; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
     header a { color: white; text-decoration: none; font-weight: 700; }
     .container { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
     .media { width: 100%; height: 220px; background: #f1f1f4; display: grid; place-items: center; overflow: hidden; }
     .media img, .media video { width: 100%; height: 100%; object-fit: cover; display: block; }
     .info { padding: 12px 14px; display: grid; gap: 6px; }
@@ -39,6 +40,7 @@
     <div id="empty" class="empty" style="display:none">暂无内容，去“发布”上传吧～</div>
   </div>
 
+  <script src="https://vjs.zencdn.net/8.14.1/video.min.js"></script>
   <script>
     function formatTime(ts){
       try { return new Date(ts).toLocaleString(); } catch { return '' }
@@ -53,9 +55,17 @@
 
       if (item.type === 'video') {
         const v = document.createElement('video');
-        v.src = item.url;
-        v.controls = true;
+        v.className = 'video-js vjs-default-skin';
+        v.setAttribute('controls', '');
+        v.setAttribute('preload', 'metadata');
+        v.setAttribute('playsinline', '');
+        const source = document.createElement('source');
+        source.src = item.url;
+        if (item.mimeType) source.type = item.mimeType;
+        v.appendChild(source);
         media.appendChild(v);
+        // Initialize Video.js player
+        try { window.videojs && window.videojs(v, { controls: true, preload: 'metadata', fluid: true }); } catch (e) {}
       } else {
         const img = document.createElement('img');
         img.src = item.url;
