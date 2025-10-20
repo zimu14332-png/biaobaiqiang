@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>表白墙 - 详情</title>
+  <link href="https://vjs.zencdn.net/8.14.1/video-js.css" rel="stylesheet" />
+  <style>
+    :root {
+      --pink: #ff6b81;
+      --bg1: #fff0f5;
+      --bg2: #ffe6ef;
+      --card: #ffffff;
+      --text: #222;
+      --muted: #666;
+      --border: #ffd1dc;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif; background: linear-gradient(180deg, var(--bg1), var(--bg2)); color: var(--text); }
+    header { background: var(--pink); color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+    header a { color: white; text-decoration: none; font-weight: 700; }
+    .container { max-width: 900px; margin: 24px auto; padding: 0 16px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,0.05); }
+    .media { width: 100%; aspect-ratio: 16/9; background: #f1f1f4; display: grid; place-items: center; overflow: hidden; }
+    .media img, .media video { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .info { padding: 16px 18px; display: grid; gap: 8px; }
+    .title { font-weight: 800; font-size: 18px; }
+    .desc { color: var(--muted); font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
+    .time { color: var(--muted); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/">← 返回首页</a>
+    <strong>详情</strong>
+  </header>
+  <div class="container">
+    <div id="root" class="card">
+      <div class="media" id="media"></div>
+      <div class="info">
+        <div class="title" id="title"></div>
+        <div class="desc" id="desc"></div>
+        <div class="time" id="time"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://vjs.zencdn.net/8.14.1/video.min.js"></script>
+  <script>
+    function qs(k){ return new URLSearchParams(location.search).get(k) }
+    function formatTime(ts){ try { return new Date(ts).toLocaleString(); } catch { return '' } }
+    async function load(){
+      const id = qs('id');
+      if (!id) { document.getElementById('root').innerHTML = '<div style="padding:20px">缺少参数</div>'; return; }
+      const res = await fetch('/api/item?id=' + encodeURIComponent(id));
+      const json = await res.json();
+      if (!res.ok) { document.getElementById('root').innerHTML = '<div style="padding:20px">未找到该内容</div>'; return; }
+      const item = json.item;
+      document.getElementById('title').textContent = `${item.className} · ${item.personName}`;
+      document.getElementById('desc').textContent = item.description || '';
+      document.getElementById('time').textContent = formatTime(item.uploadedAt);
+      const media = document.getElementById('media');
+      media.innerHTML = '';
+      if (item.type === 'video') {
+        const v = document.createElement('video');
+        v.className = 'video-js vjs-default-skin';
+        v.setAttribute('controls', '');
+        v.setAttribute('preload', 'metadata');
+        v.setAttribute('playsinline', '');
+        const source = document.createElement('source');
+        source.src = item.url;
+        if (item.mimeType) source.type = item.mimeType;
+        v.appendChild(source);
+        media.appendChild(v);
+        try { window.videojs && window.videojs(v, { controls: true, preload: 'metadata', fluid: true }); } catch (e) {}
+      } else {
+        const img = document.createElement('img');
+        img.src = item.url;
+        img.alt = '';
+        media.appendChild(img);
+      }
+    }
+    load();
+  </script>
+</body>
+</html>
