@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  {% if not posts %}
+    <div class="empty">
+      <p>还没有内容，<a href="{{ url_for('upload') }}">成为第一位发布者</a>吧！</p>
+    </div>
+  {% else %}
+    <section class="gallery">
+      {% for post in posts %}
+        <article class="card">
+          <div class="image-wrap">
+            <img src="{{ url_for('static', filename='uploads/' ~ post.image_filename) }}" alt="{{ post.name }} 的表白" loading="lazy" />
+          </div>
+          <div class="card-body">
+            <h3 class="card-title">{{ post.name }}</h3>
+            <p class="card-date">{{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+            <p class="card-desc">{{ post.description }}</p>
+          </div>
+        </article>
+      {% endfor %}
+    </section>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>发布表白</h2>
+  <form class="form" action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+    <div class="form-field">
+      <label for="name">你的昵称/称呼</label>
+      <input id="name" name="name" type="text" placeholder="如：小明" required />
+    </div>
+
+    <div class="form-field">
+      <label for="description">想说的话</label>
+      <textarea id="description" name="description" rows="4" placeholder="写点介绍或想说的话吧" required></textarea>
+    </div>
+
+    <div class="form-field">
+      <label for="image">上传图片</label>
+      <input id="image" name="image" type="file" accept="image/*" required />
+      <p class="help">支持 PNG / JPG / JPEG / GIF / WEBP，大小不超过 10MB。</p>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn primary" type="submit">发布</button>
+      <a class="btn" href="{{ url_for('index') }}">返回首页</a>
+    </div>
+  </form>
+{% endblock %}
