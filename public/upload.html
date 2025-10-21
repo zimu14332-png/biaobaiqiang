@@ -30,7 +30,7 @@
   </header>
   <div class="container">
     <h1>发布到表白墙</h1>
-    <form id="uploadForm">
+    <form id="uploadForm" novalidate>
       <div class="row">
         <div>
           <label for="className">班级</label>
@@ -57,10 +57,21 @@
   <script>
     const form = document.getElementById('uploadForm');
     const msg = document.getElementById('msg');
+    const classInput = document.getElementById('className');
+    const personInput = document.getElementById('personName');
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       msg.textContent = '';
       msg.className = 'msg';
+
+      const className = (classInput.value || '').trim();
+      const personName = (personInput.value || '').trim();
+      if (!className || !personName) {
+        msg.textContent = '请填写班级和姓名';
+        msg.className = 'msg error';
+        return;
+      }
 
       const data = new FormData(form);
       try {
