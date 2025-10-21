@@ -49,6 +49,7 @@
     function createCard(item) {
       const el = document.createElement('div');
       el.className = 'card';
+      el.style.cursor = 'pointer';
 
       const media = document.createElement('div');
       media.className = 'media';
@@ -94,6 +95,19 @@
 
       el.appendChild(media);
       el.appendChild(info);
+
+      // Navigate to detail when clicking the card (except when interacting with video controls)
+      const goDetail = () => {
+        if (!item.id) return;
+        location.href = '/detail?id=' + encodeURIComponent(item.id);
+      };
+      el.addEventListener('click', (e) => {
+        if (e.target.closest('video') || e.target.closest('button') || e.target.closest('a') || e.target.closest('input')) return;
+        goDetail();
+      });
+      el.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') goDetail();
+      });
       return el;
     }
 

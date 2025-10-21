@@ -30,7 +30,7 @@
   </header>
   <div class="container">
     <h1>发布到表白墙</h1>
-    <form id="uploadForm">
+    <form id="uploadForm" novalidate>
       <div class="row">
         <div>
           <label for="className">班级</label>
@@ -47,7 +47,7 @@
 
       <label for="files">图片/视频</label>
       <input id="files" name="files" type="file" accept="image/*,video/*" multiple required />
-      <div class="help">单个文件不超过 50MB，支持多文件</div>
+      <div class="help">支持多文件，无大小限制（取决于服务器/网络能力）</div>
 
       <button type="submit">提交</button>
       <div id="msg" class="msg"></div>
@@ -57,10 +57,21 @@
   <script>
     const form = document.getElementById('uploadForm');
     const msg = document.getElementById('msg');
+    const classInput = document.getElementById('className');
+    const personInput = document.getElementById('personName');
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       msg.textContent = '';
       msg.className = 'msg';
+
+      const className = (classInput.value || '').trim();
+      const personName = (personInput.value || '').trim();
+      if (!className || !personName) {
+        msg.textContent = '请填写班级和姓名';
+        msg.className = 'msg error';
+        return;
+      }
 
       const data = new FormData(form);
       try {
